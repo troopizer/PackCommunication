@@ -16,7 +16,6 @@ begin	KEYWORD2
 send	KEYWORD2
 recv	KEYWORD2
 recv_wait	KEYWORD2
-sync	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
