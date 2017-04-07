@@ -18,8 +18,8 @@ public:
 	PackCommunication();
 	~PackCommunication();
 
-	bool begin(char *path, int baud_rate=9600);
-	void send(char *bytes, int size_b);
+	bool begin(const char *path, int baud_rate=9600);
+	void send(const char *bytes, int size_b);
 	bool recv(char *bytes, int &size_b);
 	bool recv_wait(char *bytes, int &size_b);
 };

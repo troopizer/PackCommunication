@@ -12,14 +12,14 @@ PackCommunication::PackCommunication():
 PackCommunication::~PackCommunication()
 {}
 
-bool PackCommunication::begin(char *path, int baud_rate)
+bool PackCommunication::begin(const char *path, int baud_rate)
 {
 	fd = secex::open_arduino(path, baud_rate);
 	byteT = 1000000/baud_rate;
 	return secex::device_open(fd);
 }
 
-void PackCommunication::send(char *bytes, int size_b)
+void PackCommunication::send(const char *bytes, int size_b)
 {
 	char c;
 	secex::block_write(fd, &SFLAG, 1);
