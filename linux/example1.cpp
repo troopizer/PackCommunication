@@ -8,13 +8,13 @@ int main(int argc, char *argv[])
 	int size_b;
 	PackCommunication paco;
 
-	if (!paco.begin("/dev/ttyUSB0", 9600)) {
+	if (!paco.begin("/dev/ttyACM0", 9600)) {
 		printf("Couldn't open device\n");
 		return 1;
 	}
 	printf("Device open\n");
 
-	paco.send("sending", 6);
+	paco.send("sending", 7);
 	for (;;usleep(50)) {
 		if (paco.recv_wait(buffer, size_b)) {
 			buffer[size_b] = '\0';
