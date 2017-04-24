@@ -8,20 +8,22 @@ private:
 	static const char SFLAG;
 	static const char EFLAG;
 	static const char ESCC;
-	static const char XORC;
 
 private:
-	HardwareSerial *ss;
+	HardwareSerial * ss;
 	int byteT;
+	bool flushing;
 
 public:
-	PackCommunication(HardwareSerial &serial);
+	PackCommunication();
 	~PackCommunication();
 
-	bool begin(int baud_rate=9600);
-	void send(char *bytes, int size_b);
-	bool recv(char *bytes, int &size_b);
-	bool recv_wait(char *bytes, int &size_b);
+	bool begin(HardwareSerial & serial, bool _flushing=false);
+	void send(char * bytes, int size_b);
+	bool recv(char * bytes, int &size_b);
+	bool recv_wait(char * bytes, int &size_b);
 };
+
+extern PackCommunication Paco;
 
 #endif // #ifndef __PACK_COMMUNICATION_H

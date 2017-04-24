@@ -1,20 +1,22 @@
 #include "PackCommunication.h"
 
-static const char PackCommunication::SFLAG = 0x30;
-static const char PackCommunication::EFLAG = 0x31;
-static const char PackCommunication::ESCC  = 0x32;
-static const char PackCommunication::XORC  = 0x20;
+PackCommunication Paco;
 
-PackCommunication::PackCommunication(HardwareSerial &serial):
-	ss(&serial),
-	byteT(1000000)
-{}
-PackCommunication::~PackCommunication()
-{}
+const char PackCommunication::SFLAG = 0x30;
+const char PackCommunication::EFLAG = 0x31;
+const char PackCommunication::ESCC  = 0x32;
 
-bool PackCommunication::begin(int baud_rate)
+PackCommunication::PackCommunication() :
+	ss      (nullptr),
+	byteT   (1000000/9600),
+	flushing(false) {}
+PackCommunication::~PackCommunication(){}
+
+bool PackCommunication::begin(HardwareSerial &serial, bool _flushing)
 {
-	ss->begin(baud_rate);
+	ss       = &serial;
+	byteT    = 1000000/9600;
+	flushing = _flushing;
 	return ss;
 }
 
@@ -23,20 +25,20 @@ void PackCommunication::send(char *bytes, int size_b)
 	if (size_b < 1)	return;
 
 	ss->write(SFLAG);
-	ss->flush();
+	//ss->flush();
 	char c;
 	for (int i=0;i<size_b;i++) {
 		c = (bytes[i]);
 		if (c == SFLAG || c == EFLAG || c == ESCC) {
 			ss->write(ESCC);
-			c ^= XORC;
-			ss->flush();
+			//ss->flush();
 		}
 		ss->write(c);
-		ss->flush();
+		//ss->flush();
 	}
 	ss->write(EFLAG);
-	ss->flush();
+	if (flushing)
+		ss->flush();
 }
 
 bool PackCommunication::recv(char *bytes, int &size_b)
@@ -47,14 +49,13 @@ bool PackCommunication::recv(char *bytes, int &size_b)
 	char c;
 	if (ss->readBytes(&c, 1) < 1 || c != SFLAG)	return false;
 	do {
-		while (ss->available() == 0) delayMicroseconds(byteT);
+		while (ss->available() < 1) delayMicroseconds(byteT);
 		ss->readBytes(&c, 1);
-		if (c == ESCC) {
-			while (ss->available() == 0) delayMicroseconds(byteT);
-			ss->readBytes(&c, 1);
-			c ^= XORC;
-		}
 		if (c == EFLAG) break;
+		if (c == ESCC) {
+			while (ss->available() < 1) delayMicroseconds(byteT);
+			ss->readBytes(&c, 1);
+		}
 		bytes[size_b++] = c;
 	} while (1);
 
@@ -63,9 +64,8 @@ bool PackCommunication::recv(char *bytes, int &size_b)
 
 bool PackCommunication::recv_wait(char *bytes, int &size_b)
 {
-	do {
-		while (ss->available() == 0) delayMicroseconds(byteT);
-		if (!recv(bytes, size_b)) return false;
-	} while (size_b == 0);
+	while (!recv(bytes, size_b)) {
+		delayMicroseconds(byteT);
+	} 
 	return true;
 }
