@@ -25,7 +25,7 @@ class PackCommunication:
 		except serial.serialutil.SerialException:
 			self.error = path + " not found"
 
-	def open(self):
+	def opened(self):
 		return self.s.is_open
 
 	def send(self, string):
@@ -57,7 +57,6 @@ class PackCommunication:
 			return buff
 		
 		byte = self.s.read()
-		print(byte)
 		if (byte != self.SFLAG):
 			return buff
 
@@ -86,8 +85,8 @@ class PackCommunication:
 if __name__ == "__main__":
 	print("Example 1")
 
-	paco = PackCommunication("COM4", 9600)
-	if not paco.open():
+	paco = PackCommunication("COM3", 115200)
+	if not paco.opened():
 		print("Error : ", paco.error)
 		exit(1)
 
