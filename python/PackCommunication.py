@@ -92,6 +92,6 @@ if __name__ == "__main__":
 
 	while True:
 		paco.send("Hello World")
-		print(paco.recv_wait())
+		print(paco.recv_wait().decode("utf-8") )
 
 	
